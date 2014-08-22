@@ -18,10 +18,31 @@ $options = array(
 	'cache_path' => '/tmp',
 	'cache_lifetime' => 300,	
 );
-$Api = new \Fotkomotko\Api($options);
+$api = new \Fotkomotko\Api\Albums($options);
+$api->auth( 'username', 'password', \Fotkomotko\Api::AUTH_DIGEST );
 
-// get data from single album
-$album = $api->cache(600)->getAlbum(2);
+// --------------------------------------------------------
+// --------------------------------------------------------
+
+// ALBUMS
+// Get list of albums (cache 5 minutes)
+
+// passed params
+$params = array();
+
+// params as function
+$response = $api
+	->cache(300)
+	->visibility( \Fotkomotko\Api::VISIBILITY_PUBLIC )
+	->continents( \Fotkomotko\Api::EUROPE )
+	->years(2014)
+	->getAlbums($params);
+
+	if( $response->success ) {
+		echo '<p>Album: <strong>' . $response->data['title'] . '</strong></p>';
+	} else {
+		echo '<p>Error: <strong>' . $response->code . ': ' . $response->message . '</strong></p>';
+	}
 ```
 ## License
 

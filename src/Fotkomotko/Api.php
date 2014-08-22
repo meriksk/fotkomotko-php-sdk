@@ -8,11 +8,32 @@ class Api {
 
 	const AUTH_BASIC = 'basic';
 	const AUTH_DIGEST = 'digest';
-
+	
+	// continents
+	const AFRICA = 1;
+	const ANTARTICA = 2;
+	const ASIA = 3;
+	const AUSTRALIA = 4;
+	const EUROPE = 5;
+	const NORTH_AMERICA = 6;
+	const SOUTH_AMERICA = 7;
+	
+	// visibility
+	const VISIBILITY_PUBLIC = 1;
+	const VISIBILITY_PROTECTED = 2;
+	const VISIBILITY_PRIVATE = 3;
+		
 	/**
 	 * REST Client class
+	 * @var \Fotkomotko\RestClient
 	 */
-	private $client;
+	protected $client;
+	
+	/**
+	 * Request params
+	 * @var array
+	 */
+	protected $params = array();
 
 	/**
 	 * Class constructor
@@ -43,45 +64,81 @@ class Api {
     	return $this;
     }
 
-    // ------------------------------------------------------------------------
-    //
-    // ALBUMS
-    //
-    // ------------------------------------------------------------------------
-
 	/**
-	 * Get Album
+	 * Merge request params
+	 * @param array $params
 	 */
-	public function getAlbum($id, $params = array()) {
-		return new JsonResponse( $this->client->get('/albums/' . intval($id), $params) );
+	protected function mergeParams( $params = array() )
+	{
+		$params = is_array($params) ? $params : array();
+		return array_merge_recursive( $this->params, $params );
+	}
+	
+	/**
+	 * Before request
+	 */
+	protected function beforeRequest()
+	{
+		$this->params = array();
 	}
 
+	// -------------------------------------------------------------------------
+    // FILTERS
+    // -------------------------------------------------------------------------
+	
 	/**
-	 * Get Albums
+	 * Filter response by year of date taken
+	 * @param integer|array $years
+	 * @return \Fotkomotko\Api
 	 */
-	public function getAlbums($params = array()) {
-		return new JsonResponse( $this->client->get('/albums', $params) );
+	public function years( $years )
+	{
+		$this->params['years'] = $years;
+		return $this;
 	}
-
-    // ------------------------------------------------------------------------
-    //
-    // PHOTOS
-    //
-    // ------------------------------------------------------------------------
-
+	
 	/**
-	 * Get Album
+	 * Filter response by album ids
+	 * @param integer|array $albums
+	 * @return \Fotkomotko\Api
 	 */
-	public function getPhoto($id, $params = array()) {
-		return new JsonResponse( $this->client->get('/photos/' . intval($id), $params) );
+	public function albums( $albums )
+	{
+		$this->params['albumId'] = $albums;
+		return $this;
 	}
-
+	
 	/**
-	 * Get Albums
+	 * Filter response by continents
+	 * @param integer|array $continent
+	 * @return \Fotkomotko\Api
 	 */
-	public function getPhotos($params = array()) {
-		return new JsonResponse( $this->client->get('/photos', $params) );
+	public function continents( $continent )
+	{
+		$this->params['continent'] = $continent;
+		return $this;
 	}
-
+	
+	/**
+	 * Filter response by visibility flag
+	 * @param integer|array $visibility
+	 * @return \Fotkomotko\Api
+	 */
+	public function visibility( $visibility )
+	{
+		$this->params['visibility'] = $visibility;
+		return $this;
+	}
+	
+	/**
+	 * Filter response by tags
+	 * @param string|array $years
+	 * @return \Fotkomotko\Api
+	 */
+	public function tags( $tags )
+	{
+		$this->params['tags'] = $tags;
+		return $this;
+	}
 
 }

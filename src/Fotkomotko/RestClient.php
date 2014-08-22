@@ -9,7 +9,8 @@ use \Exception;
  * (c) 2013 Travis Dent <tcdent@gmail.com>
  */
 
-class RestClient {
+class RestClient 
+{
     
     public $options;
     public $handle; // cURL resource handle.
@@ -17,14 +18,13 @@ class RestClient {
     private $parameters;
 
     // Populated after execution:
-    public $response; // Response body.
-    public $headers; // Parsed reponse header object.
-    public $info; // Response info object.
-    public $error; // Response error string.
+    protected $response; // Response body.
+    protected $headers; // Parsed reponse header object.
+    protected $info; // Response info object.
+    protected $error; // Response error string.
 
     // Cache 
-    private $cacheTmpLifetime = 0;
-    private $cacheTmpEnabled = true;
+    protected $cacheTmpLifetime = 0;
 
     // Digest Auth
     private $digestAlgorithm = 'MD5';
@@ -56,7 +56,7 @@ class RestClient {
         );
         
         $this->options = array_merge($default_options, $options);
-        $this->checkOptions($default_options);
+        $this->checkOptions( $default_options );
     }
     
     /**
@@ -65,8 +65,8 @@ class RestClient {
     public function checkOptions($default_options) {
     
         //base url
-        if( !empty($client->options['base_url']) ) {
-            $client->options['base_url'] = rtrim($client->options['base_url'], '/');
+        if( !empty($this->options['base_url']) ) {
+            $this->options['base_url'] = rtrim($this->options['base_url'], '/');
         }
 
         // cache
@@ -115,23 +115,21 @@ class RestClient {
         // parameters
         $parameters = array_merge( $this->options['parameters'], $parameters );
 
-        // check request method
-        if( $this->requestMethod !== 'GET' ) {
-            $this->cacheTmpDisable();
-        }
-
         // set params
         $client = clone $this;
         $client->url = $url;
         $client->requestMethod = strtoupper($method);
         $client->parameters = $parameters;
-
-        // reset cache temporary options
-        $this->resetCacheTmpOptions();
-
+		
+        // check request method
+        if( $client->requestMethod !== 'GET' ) { $client->cacheTmpDisable(); }
+		
         // get cache
         $response = $client->getCache();
-        if( $response !== false ) { return $response; }
+        if( $response !== false ) {
+			$this->afterExecute();
+			return $response; 
+		}
 
         // CURL
         $client->handle = curl_init();
@@ -143,12 +141,12 @@ class RestClient {
 
 
         // POST
-        if( $client->requestMethod == 'POST' ){
+        if( $client->requestMethod === 'POST' ){
             $curlopt[CURLOPT_POST] = TRUE;
             $curlopt[CURLOPT_POSTFIELDS] = $client->formatQuery($parameters);
         }
         // OTHERS
-        elseif( $client->requestMethod != 'GET' ){
+        elseif( $client->requestMethod !== 'GET' ){
             $curlopt[CURLOPT_CUSTOMREQUEST] = $client->requestMethod;
             $curlopt[CURLOPT_POSTFIELDS] = $client->formatQuery($parameters);
         }
@@ -196,19 +194,38 @@ class RestClient {
 
         // cache
         $client->saveCache();
-
+		
+		// after execute
+		$this->afterExecute();
+		
         // response
         return $client->response;
     }
+	
+	/**
+	 * After execute
+	 */
+	private function afterExecute()
+	{
+		// reset tmp cache liftime
+		$this->cacheTmpLifetime = 0;
+	}
     
     /**
      * Format query
      */
-    public function formatQuery( $parameters, $primary='=', $secondary='&' ) {
-        $query = '';
+    public function formatQuery( $parameters, $primary = '=', $secondary = '&' ) {
+        $query = '';		
         foreach( $parameters as $key => $value ){
-            $pair = array(urlencode($key), urlencode($value));
-            $query .= implode($primary, $pair) . $secondary;
+			
+			if( is_array($value) ) {
+				$pair = array(urlencode($key), '');
+				$query .= implode($primary, $pair);
+				$query .= implode(',', $value) . $secondary;
+			} else {
+				$pair = array(urlencode($key), urlencode($value));
+				$query .= implode($primary, $pair) . $secondary;
+			}
         }
 
         return rtrim($query, $secondary);
@@ -257,24 +274,21 @@ class RestClient {
 
 
     /**
-     * Set temporary cache lifetime (per one request) or 
-     * disable it
+     * Set temporary cache lifetime (per one request) or disable it
      */
     public function setCacheLifetime( $lifetime ) {
-        if( $lifetime === false ) {
-            $this->cacheTmpEnabled = false;
-        } elseif( $lifetime > 0 ) {
-            $this->cacheTmpLifetime = (int)$lifetime;
-        }
+        $this->cacheTmpLifetime = ($lifetime===false) ? false : (int)$lifetime;
     }
 
     /**
      * Returns data from cache
      */
     private function getCache() {
-        if( $this->cacheTmpEnabled===true && $this->options['cache_enabled'] === true ) {
+        if( $this->cacheTmpLifetime!==false && $this->options['cache_enabled'] === true ) {
+			
             $key = $this->cacheKey();
             $path = $this->cachePath($key);
+			
             if( file_exists($path) ) {
                 $lifetime = ($this->cacheTmpLifetime > 0) ? $this->cacheTmpLifetime : $this->options['cache_lifetime'];
                 if( (time() - filemtime($path)) <= $lifetime) {
@@ -292,7 +306,7 @@ class RestClient {
      * Set cache
      */
     private function saveCache() {
-        if( $this->cacheTmpEnabled===true && $this->options['cache_enabled'] === true ) {
+        if( $this->cacheTmpLifetime!==false && $this->options['cache_enabled'] === true ) {
             $path = $this->cachePath($this->cacheKey());
             return file_put_contents($path, serialize($this->response));
         } else {
@@ -304,7 +318,7 @@ class RestClient {
      * Delete cache file
      */
     private function deleteCache($key) {
-        if( $this->cacheTmpEnabled===true && $this->options['cache_enabled'] === true ) {
+        if( $this->cacheTmpLifetime!==false && $this->options['cache_enabled'] === true ) {
             $path = $this->cachePath($key);
             if( file_exists($path) ) {
                 return unlink($path);
@@ -337,21 +351,5 @@ class RestClient {
     private function cachePath($key) {
         return $this->options['cache_path'] . '/' . $key;
     }
-
-    /**
-     * Reset cache temporary options
-     */
-    private function resetCacheTmpOptions() {
-        $this->cacheTmpLifetime = 0;
-        $this->cacheTmpEnabled = true;
-    }
-
-    /**
-     * Temporary disable cache
-     */
-    private function cacheTmpDisable() {
-        $this->cacheTmpEnabled = false;
-    }
-
 
 }
