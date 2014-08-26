@@ -8,16 +8,24 @@ $options = array(
 	'base_url' => 'http://localhost/fotkocms/api',
 	'cache_enabled' => false,
 	'cache_lifetime' => 300,
-	'username' => '',
-	'password' => '',
+	'username' => 'merik',
+	'password' => 'merik',
 );
 
 // --------------------------------------------------------
 // --------------------------------------------------------
 
+// API
+$api = new \Fotkomotko\Api($options);
+
+// COLLECTIONS
+// Get collections list
+$collections = $api
+	->tags('iphone')
+	->getCollections(array('albums' => true));
+
 // ALBUMS
 // Get album data (5min cache)
-$api = new \Fotkomotko\Api\Albums($options);
 $album = $api
 	->cache(300)
 	->visibility( \Fotkomotko\Api::VISIBILITY_PUBLIC )

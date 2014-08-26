@@ -138,5 +138,77 @@ class Api {
 		$this->params['tags'] = $tags;
 		return $this;
 	}
+	
+	// -------------------------------------------------------------------------
+	// ALBUMS
+	// -------------------------------------------------------------------------
+	
+	/**
+	 * Get Album
+	 */
+	public function getAlbum($id, $params = array()) {
+		$params = $this->mergeParams($params);
+		$this->beforeRequest();
+
+		return new JsonResponse( $this->client->get('/albums/' . intval($id), $params) );
+	}
+
+	/**
+	 * Get albums list
+	 */
+	public function getAlbums($params = array()) {
+		$params = $this->mergeParams($params);
+		$this->beforeRequest();
+
+		return new JsonResponse( $this->client->get('/albums', $this->mergeParams($params)) );
+	}
+	
+	// -------------------------------------------------------------------------
+	// PHOTOS
+	// -------------------------------------------------------------------------
+	
+	/**
+	 * Get Photo
+	 */
+	public function getPhoto($id, $params = array()) {
+		$params = $this->mergeParams($params);
+		$this->beforeRequest();
+
+		return new JsonResponse( $this->client->get('/photos/' . intval($id), $params) );
+	}
+
+	/**
+	 * Get photos list
+	 */
+	public function getPhotos($params = array()) {
+		$params = $this->mergeParams($params);
+		$this->beforeRequest();
+
+		return new JsonResponse( $this->client->get('/photos', $this->mergeParams($params)) );
+	}
+	
+	// -------------------------------------------------------------------------
+	// COLLECTIONS
+	// -------------------------------------------------------------------------
+	
+	/**
+	 * Get Photo
+	 */
+	public function getCollection($id, $params = array()) {
+		$params = $this->mergeParams($params);
+		$this->beforeRequest();
+
+		return new JsonResponse( $this->client->get('/collections/' . intval($id), $params) );
+	}
+
+	/**
+	 * Get albums list
+	 */
+	public function getCollections($params = array()) {
+		$params = $this->mergeParams($params);
+		$this->beforeRequest();
+
+		return new JsonResponse( $this->client->get('/collections', $this->mergeParams($params)) );
+	}
 
 }

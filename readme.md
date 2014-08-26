@@ -1,10 +1,11 @@
-# Fotkomotko Client
+# Fotkomotko PHP SDK
 
 Fotkomotko Client is a SDK library that allows to fetch data from Fotkomotko Services.
 
 ## Basic Usage
 
-Use `Faker\Factory::create()` to create and initialize a faker generator, which can generate data by accessing properties named after the type of data you want.
+Use `new \Fotkomotko\Api($options)` to create and initialize an API client. 
+Option **base_url**  is required. The minimal you'll need to have is:
 
 ```php
 <?php
@@ -12,38 +13,95 @@ Use `Faker\Factory::create()` to create and initialize a faker generator, which 
 require_once '/path/to/FotkomotkoClient/src/autoload.php';
 // alternatively, use composer
 
-// use the factory to create a Faker\Generator instance
 $options = array(
 	'base_url' => 'http://url-to-fotkomotko/api',
-	'cache_path' => '/tmp',
-	'cache_lifetime' => 300,	
+	'username' => 'your_username',
+	'password' => 'your_password',
 );
-$api = new \Fotkomotko\Api\Albums($options);
-$api->auth( 'username', 'password', \Fotkomotko\Api::AUTH_DIGEST );
+$api = new \Fotkomotko\Api($options);
+```
 
-// --------------------------------------------------------
-// --------------------------------------------------------
+With Composer:
 
-// ALBUMS
-// Get list of albums (cache 5 minutes)
+Add the `"meriksk/fotkomotko-php-sdk": "@stable"` into the `require` section of your `composer.json`.
+Run composer install. The example will look like
 
-// passed params
-$params = array();
+```php
+if (($loader = require_once __DIR__ . '/vendor/autoload.php') == null)  {
+  die('Vendor directory not found, Please run composer install.');
+}
 
-// params as function
-$response = $api
-	->cache(300)
-	->visibility( \Fotkomotko\Api::VISIBILITY_PUBLIC )
-	->continents( \Fotkomotko\Api::EUROPE )
-	->years(2014)
-	->getAlbums($params);
+$options = array(
+	'base_url' => 'http://url-to-fotkomotko/api',
+	'username' => 'your_username',
+	'password' => 'your_password',
+);
+$api = new \Fotkomotko\Api($options);
+```
+
+## Endpoints
+
+### Albums
+
+```php
+// Get single album
+$photo = $api->getAlbum(1);
 
 	if( $response->success ) {
 		echo '<p>Album: <strong>' . $response->data['title'] . '</strong></p>';
 	} else {
 		echo '<p>Error: <strong>' . $response->code . ': ' . $response->message . '</strong></p>';
 	}
-```
-## License
 
-Faker is released under the MIT Licence. See the bundled LICENSE file for details.
+// Get list of albums
+$params = array('tags' => 'europe');
+$albums = $api
+	->visibility( \Fotkomotko\Api::VISIBILITY_PUBLIC )
+	->continents( \Fotkomotko\Api::EUROPE )
+	->years(2014)
+	->getAlbums($params);
+
+	if( $response->success ) {
+		foreach( $albums as $album { ... }
+	} else {
+		echo '<p>Error: <strong>' . $response->code . ': ' . $response->message . '</strong></p>';
+	}
+```
+
+### Photos
+
+```php
+
+// Get single photo
+$photo = $api->getPhoto(1);
+
+	if( $response->success ) {
+		echo '<p>Photo: <strong>' . $response->data['title'] . '</strong></p>';
+	} else {
+		echo '<p>Error: <strong>' . $response->code . ': ' . $response->message . '</strong></p>';
+	}
+
+// Get list of photos from a single album
+$photos = $api->albums(1)->getAlbums($params);
+
+	if( $response->success ) {
+		foreach( $photos as $photo { ... }
+	} else {
+		echo '<p>Error: <strong>' . $response->code . ': ' . $response->message . '</strong></p>';
+	}
+```
+
+### Collections
+
+```php
+// Get list of collection
+$collections = $api->getCollections($params);
+
+	if( $response->success ) {
+		foreach( $collections as $collection { ... }
+	} else {
+		echo '<p>Error: <strong>' . $response->code . ': ' . $response->message . '</strong></p>';
+	}
+
+
+```
