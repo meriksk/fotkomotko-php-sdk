@@ -1,7 +1,7 @@
 {
 	"name": "meriksk/fotkomotkoapi",
 	"type": "project",
-	"description": "Fotkomotko API",
+	"description": "Fotkomotko PHP SDK",
 	"keywords": ["fotkomotko", "api", "sdk"],
 	"authors": [
 		{
