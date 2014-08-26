@@ -1,23 +1,23 @@
 {
-    "name": "meriksk/fotkomotkoapi",
+	"name": "meriksk/fotkomotkoapi",
 	"type": "project",
-    "description": "Fotkomotko API",
+	"description": "Fotkomotko API",
 	"keywords": ["fotkomotko", "api", "sdk"],
-    "authors": [
-        {
-            "name": "Marek Drugac",
-            "email": "marek@luceon.sk"
-        }
-    ],
+	"authors": [
+		{
+			"name": "Marek Drugac",
+			"email": "marek@luceon.sk"
+		}
+	],
 	"minimum-stability": "dev",
-    "require": {
+	"require": {
 		"php": ">=5.4.0",
 		"ext-curl": "*",
-        "ext-json": "*"
-    },
+		"ext-json": "*"
+	},
 	"autoload": {
-		"psr-4": { 
-			"Fotkomotko\\": "src/Fotkomotko" 
+		"psr-4": {
+			"Fotkomotko\\": "src/Fotkomotko"
 		}
-    }
+	}
 }
