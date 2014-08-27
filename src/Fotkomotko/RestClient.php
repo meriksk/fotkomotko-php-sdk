@@ -53,7 +53,7 @@ class RestClient
 			'auth_type' => NULL,
 			'cache_enabled' => true,
 			'cache_lifetime' => 600,
-			'cache_path' => 'Cache',
+			'cache_path' => 'cache',
 		);
 		
 		$this->options = array_merge($default_options, $options);
@@ -345,8 +345,7 @@ class RestClient
 	 */
 	private function cacheKey() {
 		return 
-			'fotkomotko_' . 
-			md5(
+			'cache_' . md5(
 				$this->requestMethod . ':' . 
 				( !empty($this->options['base_url']) ? $this->options['base_url'] : '' ) . 
 				$this->url . '-' . 

@@ -46,15 +46,15 @@ class JsonResponse {
 		$getter = 'get'.ucfirst($name);
 		if( method_exists($this,$getter) )
 			return $this->{$getter}();
-		else 
+		else
 			throw new Exception('Property "'. get_class($this) .'.'. $name .'" is not defined.');
 	}
 
 	/**
 	 * Get response data
 	 */
-	public function getData() {
-		return (array)$this->data;
+	public function getData( $object = false ) {
+		return ($object === true) ? $this->data : (array)$this->data;
 	}
 
 	/**
@@ -99,9 +99,9 @@ class JsonResponse {
 	public function getSuccess() {
 		if( $this->success===true && ($this->getCode() === 200) )
 			return true;
-		else 
+		else
 			return false;
 	}
-	
+
 
 }
