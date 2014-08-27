@@ -149,8 +149,15 @@ class Api {
 	public function getAlbum($id, $params = array()) {
 		$params = $this->mergeParams($params);
 		$this->beforeRequest();
+		
+		if( is_numeric($id) ) {
+			$url = '/albums/' . intval($id);
+		} elseif( is_string($id) ) {
+			$url = '/albums';
+			$params['q'] = $id;
+		}
 
-		return new JsonResponse( $this->client->get('/albums/' . intval($id), $params) );
+		return new JsonResponse( $this->client->get($url, $params) );
 	}
 
 	/**
