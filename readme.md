@@ -44,8 +44,17 @@ $api = new \Fotkomotko\Api($options);
 ### Albums
 
 ```php
-// Get single album
+// Get single album (find by Id)
 $response = $api->getAlbum(1);
+
+	if( $response->success ) {
+		echo '<p>Album: <strong>' . $response->data['title'] . '</strong></p>';
+	} else {
+		echo '<p>Error: <strong>' . $response->code . ': ' . $response->message . '</strong></p>';
+	}
+
+// Get single album (find by title)
+$response = $api->getAlbum('album-name');
 
 	if( $response->success ) {
 		echo '<p>Album: <strong>' . $response->data['title'] . '</strong></p>';
