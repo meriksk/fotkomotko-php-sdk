@@ -19,5 +19,10 @@
 		"psr-4": {
 			"Fotkomotko\\": "src/Fotkomotko"
 		}
+	},
+	"scripts": {
+		"post-install-cmd": [
+			"php src/Fotkomotko/misc/installer postInstall",
+		]
 	}
 }
