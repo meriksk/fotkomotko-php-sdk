@@ -199,7 +199,11 @@ class RestClient
 		curl_close($client->handle);
 
 		// cache
-		$client->saveCache();
+		if( $client->requestMethod==='GET' ) {
+			if( empty($client->error) && $client->info->http_code < 400 ) {
+				$client->saveCache();
+			}
+		}
 		
 		// after execute
 		$this->afterExecute();
@@ -355,7 +359,7 @@ class RestClient
 	 * Get cache path
 	 */
 	private function cachePath($key) {
-		return $this->options['cache_path'] . '/' . $key;
+		return $this->cachePath . DIRECTORY_SEPARATOR . $key;
 	}
 
 }
