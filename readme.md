@@ -9,7 +9,7 @@ Option **base_url**  is required. The minimal you'll need to have is:
 
 ```php
 <?php
-// require the Faker autoloader
+// require the Fotkomotko autoloader
 require_once '/path/to/FotkomotkoClient/src/autoload.php';
 // alternatively, use composer
 
