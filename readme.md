@@ -45,7 +45,7 @@ $api = new \Fotkomotko\Api($options);
 
 ```php
 // Get single album
-$photo = $api->getAlbum(1);
+$response = $api->getAlbum(1);
 
 	if( $response->success ) {
 		echo '<p>Album: <strong>' . $response->data['title'] . '</strong></p>';
@@ -54,15 +54,16 @@ $photo = $api->getAlbum(1);
 	}
 
 // Get list of albums
-$params = array('tags' => 'europe');
-$albums = $api
+$response = $api
 	->visibility( \Fotkomotko\Api::VISIBILITY_PUBLIC )
 	->continents( \Fotkomotko\Api::EUROPE )
 	->years(2014)
-	->getAlbums($params);
+	->getAlbums(array(
+		'tags' => 'europe'
+	));
 
 	if( $response->success ) {
-		foreach( $albums as $album { ... }
+		foreach( $response->data['items'] as $album { ... }
 	} else {
 		echo '<p>Error: <strong>' . $response->code . ': ' . $response->message . '</strong></p>';
 	}
@@ -73,7 +74,7 @@ $albums = $api
 ```php
 
 // Get single photo
-$photo = $api->getPhoto(1);
+$response = $api->getPhoto(1);
 
 	if( $response->success ) {
 		echo '<p>Photo: <strong>' . $response->data['title'] . '</strong></p>';
@@ -82,10 +83,10 @@ $photo = $api->getPhoto(1);
 	}
 
 // Get list of photos from a single album
-$photos = $api->albums(1)->getAlbums($params);
+$response = $api->albums(1)->getAlbums($params);
 
 	if( $response->success ) {
-		foreach( $photos as $photo { ... }
+		foreach( $response->data['items'] as $photo { ... }
 	} else {
 		echo '<p>Error: <strong>' . $response->code . ': ' . $response->message . '</strong></p>';
 	}
@@ -94,11 +95,23 @@ $photos = $api->albums(1)->getAlbums($params);
 ### Collections
 
 ```php
-// Get list of collection
-$collections = $api->getCollections($params);
+// Get single collection
+$response = $api->getCollection(1);
 
 	if( $response->success ) {
-		foreach( $collections as $collection { ... }
+		echo '<p>Collection: <strong>' . $response->data['title'] . '</strong></p>';
+	} else {
+		echo '<p>Error: <strong>' . $response->code . ': ' . $response->message . '</strong></p>';
+	}
+
+// Get list of collection
+$response = $api->getCollections(array(
+	'albums' => true,
+	'coverPhoto' => true,
+));
+
+	if( $response->success ) {
+		foreach( $response->data['items'] as $collection { ... }
 	} else {
 		echo '<p>Error: <strong>' . $response->code . ': ' . $response->message . '</strong></p>';
 	}
