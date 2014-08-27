@@ -22,7 +22,7 @@
 	},
 	"scripts": {
 		"post-install-cmd": [
-			"php src/Fotkomotko/misc/installer postInstall",
+			"php src/Fotkomotko/misc/installer postInstall"
 		]
 	}
 }
