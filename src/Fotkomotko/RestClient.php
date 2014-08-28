@@ -9,9 +9,9 @@ use \Exception;
  * (c) 2013 Travis Dent <tcdent@gmail.com>
  */
 
-class RestClient 
+class RestClient
 {
-	
+
 	public $options;
 	public $handle; // cURL resource handle.
 	private $requestMethod;
@@ -23,7 +23,7 @@ class RestClient
 	protected $info; // Response info object.
 	protected $error; // Response error string.
 
-	// Cache 
+	// Cache
 	protected $cacheTmpLifetime = 0;
 	private $cachePath;
 
@@ -42,29 +42,29 @@ class RestClient
 	public function __construct( $options = array() ){
 
 		$default_options = array(
-			'headers' => array(), 
-			'parameters' => array(), 
-			'curl_options' => array(), 
-			'user_agent' => 'FotkomotkoClient', 
-			'base_url' => NULL, 
-			'format' => NULL, 
-			'username' => NULL, 
+			'headers' => array(),
+			'parameters' => array(),
+			'curl_options' => array(),
+			'user_agent' => 'FotkomotkoClient',
+			'base_url' => NULL,
+			'format' => NULL,
+			'username' => NULL,
 			'password' => NULL,
 			'auth_type' => NULL,
 			'cache_enabled' => true,
 			'cache_lifetime' => 1800,
 			'cache_path' => 'cache',
 		);
-		
+
 		$this->options = array_merge($default_options, $options);
 		$this->checkOptions( $default_options );
 	}
-	
+
 	/**
 	 * Check options
 	 */
 	public function checkOptions($default_options) {
-	
+
 		//base url
 		if( !empty($this->options['base_url']) ) {
 			$this->options['base_url'] = rtrim($this->options['base_url'], '/');
@@ -75,7 +75,7 @@ class RestClient
 			if( $this->options['cache_lifetime'] ) {
 				$this->options['cache_lifetime'] = $default_options['cache_lifetime'];
 			}
-			
+
 			$this->cachePath = dirname(__FILE__) . DIRECTORY_SEPARATOR . $this->options['cache_path'];
 			if( !is_writable($this->cachePath) ) {
 				throw new Exception(
@@ -89,20 +89,20 @@ class RestClient
 	public function set_option($key, $value){
 		$this->options[$key] = $value;
 	}
-	
+
 	// Request methods:
 	public function get( $url, $parameters=array(), $headers=array() ){
 		return $this->execute($url, 'GET', $parameters, $headers);
 	}
-	
+
 	public function post( $url, $parameters=array(), $headers=array() ){
 		return $this->execute($url, 'POST', $parameters, $headers);
 	}
-	
+
 	public function put( $url, $parameters=array(), $headers=array() ){
 		return $this->execute($url, 'PUT', $parameters, $headers);
 	}
-	
+
 	public function delete( $url, $parameters=array(), $headers=array() ){
 		return $this->execute($url, 'DELETE', $parameters, $headers);
 	}
@@ -126,22 +126,22 @@ class RestClient
 		$client->url = $url;
 		$client->requestMethod = strtoupper($method);
 		$client->parameters = $parameters;
-		
+
 		// check request method
 		if( $client->requestMethod !== 'GET' ) { $client->cacheTmpDisable(); }
-		
+
 		// get cache
 		$response = $client->getCache();
 		if( $response !== false ) {
 			$this->afterExecute();
-			return $response; 
+			return $response;
 		}
 
 		// CURL
 		$client->handle = curl_init();
 		$curlopt = array(
-			CURLOPT_HEADER => TRUE, 
-			CURLOPT_RETURNTRANSFER => TRUE, 
+			CURLOPT_HEADER => TRUE,
+			CURLOPT_RETURNTRANSFER => TRUE,
 			CURLOPT_USERAGENT => $client->options['user_agent']
 		);
 
@@ -158,12 +158,12 @@ class RestClient
 		}
 		// GET
 		elseif( count($parameters) ){
-			$client->url .= strpos($client->url, '?')? '&' : '?';
-			$client->url .= $client->formatQuery($parameters);
+			$url .= strpos($client->url, '?')? '&' : '?';
+			$url .= $client->formatQuery($parameters);
 		}
-		
+
 		// set url
-		$curlopt[CURLOPT_URL] = $client->options['base_url'] . $client->url;
+		$curlopt[CURLOPT_URL] = $client->options['base_url'] . $url;
 
 		// AUTH
 		if( !empty($client->options['username']) && !empty($client->options['password']) ) {
@@ -172,7 +172,7 @@ class RestClient
 				$curlopt[CURLOPT_USERPWD] = sprintf("%s:%s", $client->options['username'], $client->options['password']);
 			} else {
 				$curlopt[CURLOPT_HTTPAUTH] = CURLAUTH_DIGEST;
-				$client->addHeader( $client->formatDigestHeader() );				
+				$client->addHeader( $client->formatDigestHeader() );
 			}
 		}
 
@@ -195,23 +195,23 @@ class RestClient
 		curl_setopt_array($client->handle, $curlopt);
 		$client->parseResponse( curl_exec($client->handle) );
 		$client->info = (object) curl_getinfo($client->handle);
-		$client->error = curl_error($client->handle);		
+		$client->error = curl_error($client->handle);
 		curl_close($client->handle);
 
 		// cache
 		if( $client->requestMethod==='GET' ) {
 			if( empty($client->error) && $client->info->http_code < 400 ) {
-				$client->saveCache();
+				$client->setCache();
 			}
 		}
-		
+
 		// after execute
 		$this->afterExecute();
-		
+
 		// response
 		return $client->response;
 	}
-	
+
 	/**
 	 * After execute
 	 */
@@ -220,14 +220,14 @@ class RestClient
 		// reset tmp cache liftime
 		$this->cacheTmpLifetime = 0;
 	}
-	
+
 	/**
 	 * Format query
 	 */
 	public function formatQuery( $parameters, $primary = '=', $secondary = '&' ) {
-		$query = '';		
+		$query = '';
 		foreach( $parameters as $key => $value ){
-			
+
 			if( is_array($value) ) {
 				$pair = array(urlencode($key), '');
 				$query .= implode($primary, $pair);
@@ -248,7 +248,7 @@ class RestClient
 
 		$headers = array();
 		$http_ver = strtok($response, "\n");
-		
+
 		while( $line = strtok("\n") ) {
 			if(strlen(trim($line)) === 0) break;
 			list($key, $value) = explode(':', $line, 2);
@@ -263,7 +263,7 @@ class RestClient
 			else
 				$headers[$key] = array($headers[$key], $value);
 		}
-		
+
 		$this->headers = (object) $headers;
 		$this->response = strtok('');
 	}
@@ -295,10 +295,10 @@ class RestClient
 	 */
 	private function getCache() {
 		if( $this->cacheTmpLifetime!==false && $this->options['cache_enabled'] === true ) {
-			
+
 			$key = $this->cacheKey();
 			$path = $this->cachePath($key);
-			
+
 			if( file_exists($path) ) {
 				$lifetime = ($this->cacheTmpLifetime > 0) ? $this->cacheTmpLifetime : $this->options['cache_lifetime'];
 				if( (time() - filemtime($path)) <= $lifetime) {
@@ -315,9 +315,10 @@ class RestClient
 	/**
 	 * Set cache
 	 */
-	private function saveCache() {
+	private function setCache() {
 		if( $this->cacheTmpLifetime!==false && $this->options['cache_enabled'] === true ) {
 			$path = $this->cachePath($this->cacheKey());
+
 			return file_put_contents($path, serialize($this->response));
 		} else {
 			return true;
@@ -344,14 +345,13 @@ class RestClient
 	 * Format unique cache key
 	 */
 	private function cacheKey() {
-		return 
-			'cache_' . md5(
-				$this->requestMethod . ':' . 
-				( !empty($this->options['base_url']) ? $this->options['base_url'] : '' ) . 
-				$this->url . '-' . 
-				serialize($this->parameters) . 
-				(!empty($this->options['username']) ? '-' . $this->options['username'] : '')
-			);
+		return 'cache_' . md5(
+			$this->requestMethod . ':' .
+			( !empty($this->options['base_url']) ? $this->options['base_url'] : '' ) .
+			$this->url . '-' .
+			serialize($this->parameters) .
+			(!empty($this->options['username']) ? '-' . $this->options['username'] : '')
+		);
 	}
 
 	/**
