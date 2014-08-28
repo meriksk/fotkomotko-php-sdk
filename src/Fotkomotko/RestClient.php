@@ -52,7 +52,7 @@ class RestClient
 			'password' => NULL,
 			'auth_type' => NULL,
 			'cache_enabled' => true,
-			'cache_lifetime' => 600,
+			'cache_lifetime' => 1800,
 			'cache_path' => 'cache',
 		);
 		
