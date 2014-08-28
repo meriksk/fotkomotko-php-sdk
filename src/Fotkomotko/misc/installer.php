@@ -7,6 +7,6 @@
 |--------------------------------------------------------------------------
 */
 
-chmod('Fotkomotko' . DIRECTORY_SEPARATOR . 'Cache', 0775);
+chmod('Fotkomotko' . DIRECTORY_SEPARATOR . 'Cache', 0777);
 
 exit();
