@@ -219,6 +219,9 @@ class RestClient
 	{
 		// reset tmp cache liftime
 		$this->cacheTmpLifetime = 0;
+		
+		// delete old cache files
+		$this->deleteOldCacheFiles();
 	}
 
 	/**
@@ -318,7 +321,6 @@ class RestClient
 	private function setCache() {
 		if( $this->cacheTmpLifetime!==false && $this->options['cache_enabled'] === true ) {
 			$path = $this->cachePath($this->cacheKey());
-
 			return file_put_contents($path, serialize($this->response));
 		} else {
 			return true;
@@ -338,6 +340,26 @@ class RestClient
 			}
 		} else {
 			return true;
+		}
+	}
+	
+	/**
+	 * Delete all old cache files
+	 */
+	private function deleteOldCacheFiles()
+	{
+		if( rand(0,20) === 0 ) {
+			if( $handle = opendir($this->cachePath) ) {
+				while( false !== ($entry = readdir($handle)) ) {
+					if( strpos($entry, 'cache_') === 0 ) {
+						$path = $this->cachePath . DIRECTORY_SEPARATOR . $entry;
+						$filemtime = filemtime($path);
+						if( (time() - filemtime($path)) > $this->options['cache_lifetime'] ) {
+							@unlink($path);
+						}
+					}
+				}
+			}
 		}
 	}
 
