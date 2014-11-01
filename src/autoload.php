@@ -6,7 +6,7 @@
  * https://getcomposer.org/
  */
 
-if( version_compare(PHP_VERSION, '5.4.0', '<') ) {
+if( version_compare(PHP_VERSION, '5.3.0', '<') ) {
 	throw new Exception('This library requires PHP version 5.4 or higher.');
 }
 
