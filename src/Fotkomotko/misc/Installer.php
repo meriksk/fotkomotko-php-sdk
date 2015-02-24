@@ -18,6 +18,7 @@ class Installer
         $composer = $event->getComposer();
 		
         // do stuff
+		self::warmCache();
 		self::deleteCache();
     }
 
@@ -25,8 +26,11 @@ class Installer
     {
         // make cache toasty
 		$cacheDir = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'cache';
-		if( !file_exists($cacheDir) ) { mkdir($cacheDir); }
-		@chmod($cacheDir, 0777);
+		if (!file_exists($cacheDir)) { 
+			if (@mkdir($cacheDir)) {
+				@chmod($cacheDir, 0777);
+			}
+		}
     }
 	
     private static function deleteCache()
@@ -34,8 +38,8 @@ class Installer
         // make cache toasty
 		$cacheDir = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'cache';
 		$files = glob($cacheDir . DIRECTORY_SEPARATOR . '*', GLOB_NOSORT);
-		if( !empty($files) ) {
-			foreach($files as $file) {
+		if (!empty($files)) {
+			foreach ($files as $file) {
 				@unlink($file);
 			}
 		}
