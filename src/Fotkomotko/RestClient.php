@@ -77,10 +77,12 @@ class RestClient
 			}
 
 			$this->cachePath = dirname(__FILE__) . DIRECTORY_SEPARATOR . $this->options['cache_path'];
-			if( !is_writable($this->cachePath) ) {
-				throw new Exception(
-					'Directory "'. $this->cachePath .'" (property: cache_path) is not writeable. Check permissions!'
-				);
+			if (!file_exists($this->cachePath)) {
+				if (@mkdir($this->cachePath)) {
+					chmod($this->cachePath, 0777);
+				} else {
+					throw new Exception('Permission denied. Directory "'. $this->cachePath .'" (property: cache_path) does not exists.', 500);
+				}
 			}
 		}
 
