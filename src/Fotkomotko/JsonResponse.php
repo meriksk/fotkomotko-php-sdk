@@ -1,8 +1,10 @@
 <?php
 namespace Fotkomotko;
+
 use \Exception;
 
-class JsonResponse {
+class JsonResponse 
+{
 
 	private $response;
 	private $data = array();
@@ -16,7 +18,8 @@ class JsonResponse {
 	/**
 	 * Class constructor
 	 */
-	public function __construct($response) {
+	public function __construct($response) 
+	{
 		$tmp = json_decode($response, true);
 		if( $tmp !== NULL ) {
 			$this->code = $tmp['code'];
@@ -42,53 +45,61 @@ class JsonResponse {
 	 * @throws Exception if the property is not defined
 	 * @see __set
 	 */
-	public function __get($name) {
+	public function __get($name) 
+	{
 		$getter = 'get'.ucfirst($name);
-		if( method_exists($this,$getter) )
+		if (method_exists($this,$getter)) {
 			return $this->{$getter}();
-		else
+		} else {
 			throw new Exception('Property "'. get_class($this) .'.'. $name .'" is not defined.');
+		}
 	}
 
 	/**
 	 * Get response data
 	 */
-	public function getData( $object = false ) {
+	public function getData( $object = false ) 
+	{
 		return ($object === true) ? $this->data : (array)$this->data;
 	}
 
 	/**
 	 * Get response data
 	 */
-	public function getCode() {
+	public function getCode() 
+	{
 		return (int)$this->code;
 	}
 
 	/**
 	 * Get request method
 	 */
-	public function getRequestMethod() {
+	public function getRequestMethod() 
+	{
 		return $this->requestMethod;
 	}
 
 	/**
 	 * Get endpoint name
 	 */
-	public function getEndpoint() {
+	public function getEndpoint() 
+	{
 		return $this->endpoint;
 	}
 
 	/**
 	 * Get response message
 	 */
-	public function getMessage() {
+	public function getMessage() 
+	{
 		return $this->message;
 	}
 
 	/**
 	 * Get response error message
 	 */
-	public function getError() {
+	public function getError()
+	{
 		return $this->error;
 	}
 
@@ -96,11 +107,13 @@ class JsonResponse {
 	 * Get response error messageGet response "success" flag
 	 * Alis for {@link JsonResponse::getSuccess}
 	 */
-	public function getSuccess() {
-		if( $this->success===true && ($this->getCode() === 200) )
+	public function getSuccess() 
+	{
+		if ($this->success===true && ($this->getCode() === 200)) {
 			return true;
-		else
+		} else {
 			return false;
+		}
 	}
 
 
