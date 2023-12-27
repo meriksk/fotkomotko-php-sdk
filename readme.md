@@ -4,8 +4,8 @@ Fotkomotko Client is a SDK library that allows to fetch data from Fotkomotko Ser
 
 ## Basic Usage
 
-Use `new \Fotkomotko\Api($options)` to create and initialize an API client. 
-Option **base_url**  is required. The minimal you'll need to have is:
+Use `new \Fotkomotko\Api($options)` to create and initialize an API client.
+Option **base_url** is required. The minimal you'll need to have is:
 
 ```php
 <?php
@@ -27,15 +27,14 @@ Add the `"meriksk/fotkomotko-php-sdk": "@stable"` into the `require` section of 
 Run composer install. The example will look like
 
 ```php
-if (($loader = require_once __DIR__ . '/vendor/autoload.php') == null)  {
-  die('Vendor directory not found, Please run composer install.');
-}
+require_once __DIR__ . '/vendor/autoload.php';
 
-$options = array(
+$options = [
 	'base_url' => 'http://url-to-fotkomotko/api',
 	'username' => 'your_username',
 	'password' => 'your_password',
-);
+];
+
 $api = new \Fotkomotko\Api($options);
 ```
 
@@ -44,19 +43,19 @@ $api = new \Fotkomotko\Api($options);
 ### Albums
 
 ```php
-// Get single album (find by Id)
+// Get a single album (find by Id)
 $response = $api->getAlbum(1);
 
-	if( $response->success ) {
+	if ($response->success) {
 		echo '<p>Album: <strong>' . $response->data['title'] . '</strong></p>';
 	} else {
 		echo '<p>Error: <strong>' . $response->code . ': ' . $response->message . '</strong></p>';
 	}
 
-// Get single album (find by title)
-$response = $api->getAlbum('album-name');
+// Get a single album (find by album title)
+$response = $api->getAlbum('album-title');
 
-	if( $response->success ) {
+	if ($response->success) {
 		echo '<p>Album: <strong>' . $response->data['title'] . '</strong></p>';
 	} else {
 		echo '<p>Error: <strong>' . $response->code . ': ' . $response->message . '</strong></p>';
@@ -64,15 +63,16 @@ $response = $api->getAlbum('album-name');
 
 // Get list of albums
 $response = $api
-	->visibility( \Fotkomotko\Api::VISIBILITY_PUBLIC )
-	->continents( \Fotkomotko\Api::EUROPE )
+	->visibility(\Fotkomotko\Api::VISIBILITY_PUBLIC)
+	->continents(\Fotkomotko\Api::EUROPE)
 	->years(2014)
+	->sort('-date')
 	->getAlbums(array(
 		'tags' => 'europe'
 	));
 
-	if( $response->success ) {
-		foreach( $response->data['items'] as $album { ... }
+	if ($response->success) {
+		foreach($response->data['items'] as $album { ... }
 	} else {
 		echo '<p>Error: <strong>' . $response->code . ': ' . $response->message . '</strong></p>';
 	}
@@ -85,7 +85,7 @@ $response = $api
 // Get single photo
 $response = $api->getPhoto(1);
 
-	if( $response->success ) {
+	if ($response->success) {
 		echo '<p>Photo: <strong>' . $response->data['title'] . '</strong></p>';
 	} else {
 		echo '<p>Error: <strong>' . $response->code . ': ' . $response->message . '</strong></p>';
@@ -94,8 +94,8 @@ $response = $api->getPhoto(1);
 // Get list of photos from a single album
 $response = $api->albums(1)->getAlbums($params);
 
-	if( $response->success ) {
-		foreach( $response->data['items'] as $photo { ... }
+	if ($response->success) {
+		foreach($response->data['items'] as $photo { ... }
 	} else {
 		echo '<p>Error: <strong>' . $response->code . ': ' . $response->message . '</strong></p>';
 	}
@@ -107,7 +107,7 @@ $response = $api->albums(1)->getAlbums($params);
 // Get single collection
 $response = $api->getCollection(1);
 
-	if( $response->success ) {
+	if ($response->success) {
 		echo '<p>Collection: <strong>' . $response->data['title'] . '</strong></p>';
 	} else {
 		echo '<p>Error: <strong>' . $response->code . ': ' . $response->message . '</strong></p>';
@@ -119,8 +119,8 @@ $response = $api->getCollections(array(
 	'coverPhoto' => true,
 ));
 
-	if( $response->success ) {
-		foreach( $response->data['items'] as $collection { ... }
+	if ($response->success) {
+		foreach($response->data['items'] as $collection { ... }
 	} else {
 		echo '<p>Error: <strong>' . $response->code . ': ' . $response->message . '</strong></p>';
 	}
